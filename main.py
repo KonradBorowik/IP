@@ -6,4 +6,4 @@ outcome = A @ B.T
 
 print(outcome)
 w = A + B
-print(w)
+print(w*2)
