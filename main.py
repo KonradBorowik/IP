@@ -5,3 +5,5 @@ B = np.array([[3],[5]])
 outcome = A @ B.T
 
 print(outcome)
+w = A + B
+print(w)
