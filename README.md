@@ -6,6 +6,7 @@ Using:
 - openCV, sci-kit image, imutils
 
 Detecting LEDs in a image of a breadboard with mounted LEDs.
+<u>I'm updating my code on a testbranch.</u>
 
 Steps:
 1. resizing
