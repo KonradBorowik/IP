@@ -37,7 +37,7 @@ def leddetector(image):
 
         # if the number of pixels in the component is sufficiently
         # large, then add it to our mask of "large blobs"
-        if numPixels > 100:
+        if numPixels > 10:
             mask = cv2.add(mask, labelMask)
 
     # find the contours in the mask, then sort them from left to right
@@ -71,5 +71,6 @@ def leddetector(image):
 
 
 twoLedC = cv2.imread(r"C:\Users\konra\PycharmProjects\LearningGitHub\pictures\2LEDclose.jpg")
+twoLedF = cv2.imread(r"C:\Users\konra\PycharmProjects\LearningGitHub\pictures\2LEDfar.jpg")
 
-leddetector(twoLedC)
+leddetector(twoLedF)
