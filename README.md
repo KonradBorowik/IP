@@ -3,7 +3,7 @@ Image Processing
 
 Using:
 - Python 3.7
-- openCV, sci-kit image
+- openCV, sci-kit image, imutils
 
 Detecting LEDs in a image of a breadboard with mounted LEDs.
 
