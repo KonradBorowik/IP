@@ -10,12 +10,12 @@ def leddetector(image):
     resized_image = cv2.resize(image, [500, 500])
 
     # convert to grayscale and apply blur
-    gray = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (11, 11), 0)
+    blurred = cv2.GaussianBlur(resized_image, (11, 11), 0)
+    gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
 
     # separate bright spots
     # pixel's value >= 225 set to 255 (white), the rest set to 0 (black)
-    thresh = cv2.threshold(blurred, 225, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(gray, 224, 255, cv2.THRESH_BINARY)[1]
 
     # perform a connected component analysis on the thesholded image
     labels = measure.label(thresh, connectivity=2, background=0)
@@ -29,15 +29,14 @@ def leddetector(image):
         if label == 0:
             continue
 
-        # otherwise, construct the label mask and count the
-        # number of pixels
+        # otherwise, construct the label mask and count the number of pixels in the mask
         labelMask = np.zeros(thresh.shape, dtype="uint8")
         labelMask[labels == label] = 255
         numPixels = cv2.countNonZero(labelMask)
 
         # if the number of pixels in the component is sufficiently
         # large, then add it to our mask of "large blobs"
-        if numPixels > 10:
+        if 50 < numPixels:
             mask = cv2.add(mask, labelMask)
 
     # find the contours in the mask, then sort them from left to right
@@ -54,16 +53,30 @@ def leddetector(image):
         (x, y, w, h) = cv2.boundingRect(c)
         # compute the minimum enclosing circle for each contour
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
+
+        # color detection
+        img_hsl = cv2.cvtColor(finalImage, cv2.COLOR_BGR2HSV)
+
+        mean_color_value = cv2.mean(img_hsl, mask=mask)[0]
+
+        if 0 < mean_color_value < 24:
+            color = (0, 0, 255)
+        elif 26 < mean_color_value < 70:
+            color = (0, 255, 255)
+        else:
+            color = (0, 0, 0)
+
         # draw a circle around desired spots
-        cv2.circle(finalImage, (int(cX), int(cY)), int(radius), (0, 0, 255), 3)
+        cv2.circle(finalImage, (int(cX), int(cY)), int(radius), color, 3)
+
         # count each spot
-        cv2.putText(finalImage, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+        cv2.putText(finalImage, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
 
     # show images step by step
     cv2.imshow("original image", image)
     cv2.imshow("resized image", resized_image)
-    cv2.imshow("graysacle", gray)
-    cv2.imshow("blurred grayscale image", blurred)
+    cv2.imshow("blurred image", blurred)
+    cv2.imshow("blurred graysacle image", gray)
     cv2.imshow("threshold", thresh)
     cv2.imshow("Two LEDs detected", finalImage)
 
@@ -72,5 +85,6 @@ def leddetector(image):
 
 twoLedC = cv2.imread(r"C:\Users\konra\PycharmProjects\LearningGitHub\pictures\2LEDclose.jpg")
 twoLedF = cv2.imread(r"C:\Users\konra\PycharmProjects\LearningGitHub\pictures\2LEDfar.jpg")
+twoLedPaper = cv2.imread(r"C:\Users\konra\PycharmProjects\LearningGitHub\pictures\2LEDpaper.jpg")
 
-leddetector(twoLedF)
+leddetector(twoLedPaper)
