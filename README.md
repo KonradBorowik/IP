@@ -18,5 +18,3 @@ Image Processing
 - [ ] Detecting color of the LED
 
 - [ ] Following an object in a video
-
-*I'm updating my code on a testbranch.*
