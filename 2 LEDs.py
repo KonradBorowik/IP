@@ -17,7 +17,7 @@ def leddetector(image):
     # pixel's value >= 225 set to 255 (white), the rest set to 0 (black)
     thresh = cv2.threshold(gray, 224, 255, cv2.THRESH_BINARY)[1]
 
-    # perform a connected component analysis on the thesholded image
+    # perform a connected component analysis on the thresholded image
     labels = measure.label(thresh, connectivity=2, background=0)
 
     # initialize a mask to store only large enough (unique) components
@@ -83,8 +83,8 @@ def leddetector(image):
     cv2.waitKey(0)
 
 
-twoLedC = cv2.imread(r"C:\Users\konra\PycharmProjects\LearningGitHub\pictures\2LEDclose.jpg")
-twoLedF = cv2.imread(r"C:\Users\konra\PycharmProjects\LearningGitHub\pictures\2LEDfar.jpg")
-twoLedPaper = cv2.imread(r"C:\Users\konra\PycharmProjects\LearningGitHub\pictures\2LEDpaper.jpg")
+twoLedC = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\2LEDclose.jpg")
+twoLedF = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\2LEDfar.jpg")
+twoLedPaper = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\2LEDpaper.jpg")
 
 leddetector(twoLedPaper)
