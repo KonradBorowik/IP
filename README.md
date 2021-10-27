@@ -16,5 +16,8 @@ Image Processing
   6. marking those spots in a normal image
 
 - [ ] Detecting color of the LED
+* I've got an idea for that, but will try later
+
+- [ ] Detecting 3 LEDs and deciding the orientation of an object
 
 - [ ] Following an object in a video
