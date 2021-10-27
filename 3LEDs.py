@@ -6,18 +6,6 @@ import numpy as np
 import math
 
 
-def CalculateDistances(s1,s2,s3):
-    xs1 = s1[0]
-    ys1 = s1[1]
-    xs2 = s2[0]
-    ys2 = s2[1]
-    xs3 = s3[0]
-    ys3 = s3[1]
-
-    dist1 = math.hypot(xs1 - xs2, ys1 - ys2)
-    dist2 = math.hypot(xs2 - xs3, ys2 - ys3)
-    dist3 = math.hypot(xs1 - xs3, ys1 - ys3)
-
 def LedDetector(image):
     # resize
     resized_image = cv2.resize(image, [500, 500])
@@ -60,14 +48,10 @@ def LedDetector(image):
     # new image to draw circles
     finalImage = resized_image.copy()
 
-    # prepare for LEDs coordinates
-    led_coordinates = []
-
     # loop over the contours
     for (i, c) in enumerate(cnts):
         # draw the bright spot on the image
         (x, y, w, h) = cv2.boundingRect(c)
-        led_coordinates.append([x, y])
 
         # compute the minimum enclosing circle for each contour
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
@@ -77,12 +61,6 @@ def LedDetector(image):
 
         # count each spot
         cv2.putText(finalImage, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-
-    spot1 = led_coordinates[0]
-    spot2 = led_coordinates[1]
-    spot3 = led_coordinates[2]
-
-    CalculateDistances(spot1,spot2,spot3)
 
     # show images step by step
     # cv2.imshow("original image", image)
