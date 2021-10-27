@@ -47,10 +47,15 @@ def leddetector(image):
     # new image to draw circles
     finalImage = resized_image.copy()
 
+    # prepare for LEDs coordinates
+    led_coordinates = []
+
     # loop over the contours
     for (i, c) in enumerate(cnts):
         # draw the bright spot on the image
         (x, y, w, h) = cv2.boundingRect(c)
+        led_coordinates.append([x, y])
+
         # compute the minimum enclosing circle for each contour
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
 
