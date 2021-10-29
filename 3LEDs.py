@@ -49,7 +49,9 @@ def LedDetector(image):
     # new image to draw circles
     finalImage = resized_image.copy()
 
-    listx = []
+    black = np.zeros((500,500,3))
+
+    listxy = []
     listy = []
 
     # loop over the contours
@@ -60,8 +62,8 @@ def LedDetector(image):
         # compute the minimum enclosing circle for each contour
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
 
-        listx.append(cX)
-        listy.append(cY)
+        listxy.append((cX, cY))
+        # listy.append(cY)
 
         # draw a circle around desired spots
         cv2.circle(finalImage, (int(cX), int(cY)), int(radius), (0, 0, 255), 2)
@@ -69,34 +71,9 @@ def LedDetector(image):
         # count each spot
         cv2.putText(finalImage, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
-    listxy = list(zip(listx,listy))
-    listxy = np.array(listxy)
+    apexes = np.array(listxy)
 
-    black = np.zeros([500,500])
-
-    # searching for closest points
-    for i in range(0, len(listxy)):
-        x1 = listxy[i, 0]
-        y1 = listxy[i, 1]
-        distance = 0
-        secondx = []
-        secondy = []
-        dist = []
-        sort = []
-        for j in range(0, len(listxy)):
-            if i == j:
-                pass
-            else:
-                x2 = listxy[j, 0]
-                y2 = listxy[j, 1]
-                distance = np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-                secondx.append(x2)
-                secondy.append(y2)
-                dist.append(distance)
-        secondxy = list(zip(dist, secondx, secondy))
-        sort = sorted(secondxy, key=lambda second: second[0])
-        sort = np.array(sort)
-        cv2.line(finalImage, (x1, y1), (int(sort[0, 1]), int(sort[0, 2])), (0, 0, 255), 2)
+    cv2.drawContours(black, [apexes.astype(int)], 0, (0,0,255), 3)
 
     # show images step by step
     # cv2.imshow("original image", image)
