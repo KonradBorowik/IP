@@ -142,16 +142,18 @@ def ledDetector(image):
     triangle_grey = cv2.cvtColor(np.float32(triangle), cv2.COLOR_BGR2GRAY)
     cv2.imshow('tri grey', triangle_grey)
     # triangle_sides = cv2.threshold(triangle, 50, 255, cv2.THRESH_BINARY)[1]
-    _, bw = cv2.threshold(triangle_grey, 255, cv2.THRESH_BINARY, 3, 0)
+    _, bw = cv2.threshold(triangle_grey, 50, 255, cv2.THRESH_BINARY)
 
     bw = np.uint8(bw)
 
     contours, _ = cv2.findContours(bw, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+    print(contours)
 
     for i, c in enumerate(contours):
+        print("im here")
         # Draw each contour only for visualisation purposes
-        cv2.drawContours(triangle, contours, i, (0, 0, 255), 3)
-
+        cv2.drawContours(finalImage, contours, i, (0, 0, 255), 3)
+        cv2.imshow('asdfasdf', finalImage)
         # Find the orientation of each shape
         getContours(c, finalImage)
 
@@ -163,7 +165,7 @@ def ledDetector(image):
     # cv2.imshow("threshold", thresh)
     cv2.imshow("LEDs detected", finalImage)
 
-    cv2.imshow("L", triangle)
+    # cv2.imshow("L", triangle)
 
     cv2.waitKey(0)
 
