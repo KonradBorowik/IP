@@ -19,5 +19,11 @@ Image Processing
 * I've got an idea for that, but will try later
 
 - [ ] Detecting 3 LEDs and deciding the orientation of an object
+* Detects 3 LEDs in a picture
+* connects them into a triangle
+* orientation algorythm is in desperate need of calibration
 
 - [ ] Following an object in a video
+
+
+<i>the code is a mess but right now I'm focusing on achievieng my goal</i>
