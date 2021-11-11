@@ -111,8 +111,7 @@ def ledDetector(image):
     # new image to draw circles
     finalImage = resized_image.copy()
 
-    blck = np.zeros((500,500,3))
-    black = Image.fromarray(blck, 'RGB')
+    black = np.zeros((500,500,3), dtype='uint8')
     listxy = []
 
     # loop over the contours
@@ -137,32 +136,24 @@ def ledDetector(image):
     black = cv2.drawContours(black, [apexes.astype(int)], 0, (0,0,255), 1)
 
     # determining orientation of found triangle
-    triangle = cv2.fillPoly(black.copy(), [apexes.astype(int)], color=(0,0,255))
-
-    triangle_grey = cv2.cvtColor(triangle, cv2.COLOR_BGR2GRAY)
-
+    triangle = black.copy()
+    triangle = cv2.fillPoly(triangle, [apexes.astype(int)], color=(0,0,255))
+    triangle = np.uint8(triangle)
+    triangle_grey = cv2.cvtColor(np.float32(triangle), cv2.COLOR_BGR2GRAY)
+    cv2.imshow('tri grey', triangle_grey)
     # triangle_sides = cv2.threshold(triangle, 50, 255, cv2.THRESH_BINARY)[1]
-    _, bw = cv2.adaptiveThreshold(triangle_grey, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 3, 0)
+    _, bw = cv2.threshold(triangle_grey, 255, cv2.THRESH_BINARY, 3, 0)
 
-    cv2.imshow('_', _)
-    cv2.imshow('bw', bw)
+    bw = np.uint8(bw)
 
     contours, _ = cv2.findContours(bw, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-    cv2.imshow('cnts', contours)
-    # for i, c in enumerate(contours):
-    #
-    #     # Calculate the area of each contour
-    #     area = cv2.contourArea(c)
-    #
-    #     # Ignore contours that are too small or too large
-    #     if area < 3700 or 100000 < area:
-    #         continue
-    #
-    #     # Draw each contour only for visualisation purposes
-    #     cv2.drawContours(triangle, contours, i, (0, 0, 255), 2)
-    #
-    #     # Find the orientation of each shape
-    #     getContours(c, triangle)
+
+    for i, c in enumerate(contours):
+        # Draw each contour only for visualisation purposes
+        cv2.drawContours(triangle, contours, i, (0, 0, 255), 3)
+
+        # Find the orientation of each shape
+        getContours(c, finalImage)
 
     # show images step by step
     # cv2.imshow("original image", image)
@@ -171,6 +162,7 @@ def ledDetector(image):
     # cv2.imshow("blurred graysacle image", gray)
     # cv2.imshow("threshold", thresh)
     cv2.imshow("LEDs detected", finalImage)
+
     cv2.imshow("L", triangle)
 
     cv2.waitKey(0)
