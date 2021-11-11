@@ -29,7 +29,10 @@ def drawAxis(img, p_, q_, color, scale):
     cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), color, 3, cv2.LINE_AA)
 
 
-def LedDetector(image):
+def getContours(img):
+
+
+def ledDetector(image):
     # resize
     resized_image = cv2.resize(image, [500, 500])
 
@@ -72,9 +75,7 @@ def LedDetector(image):
     finalImage = resized_image.copy()
 
     black = np.zeros((500,500,3))
-
     listxy = []
-    listy = []
 
     # loop over the contours
     for (i, c) in enumerate(cnts):
@@ -85,7 +86,6 @@ def LedDetector(image):
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
 
         listxy.append((cX, cY))
-        # listy.append(cY)
 
         # draw a circle around desired spots
         cv2.circle(finalImage, (int(cX), int(cY)), int(radius), (0, 0, 255), 2)
@@ -93,6 +93,7 @@ def LedDetector(image):
         # count each spot
         cv2.putText(finalImage, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
+    # connecting the apexes
     apexes = np.array(listxy)
 
     cv2.drawContours(black, [apexes.astype(int)], 0, (0,0,255), 3)
@@ -112,4 +113,4 @@ def LedDetector(image):
 Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_1.jpg")
 Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_2.jpg")
 
-LedDetector(Pic1)
+ledDetector(Pic1)
