@@ -18,10 +18,10 @@ Image Processing
 - [ ] Detecting color of the LED
 * I've got an idea for that, but will try later
 
-- [ ] Detecting 3 LEDs and deciding the orientation of an object
+- [x] Detecting 3 LEDs and deciding the orientation of an object
 * Detects 3 LEDs in a picture
-* connects them into a triangle
-* orientation algorythm is in desperate need of calibration
+* connects them into a triangle isosceles triangle
+* using pca alorythm I can get the middle point of the trainlge and it's orientation in regard to hypotenuse
 
 - [ ] Following an object in a video
 
