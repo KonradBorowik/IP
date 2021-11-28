@@ -32,8 +32,9 @@ def drawAxis(img, p_, q_, color, scale):
 
 
 def getContours(pts, img):
-    ## [pca]
+    ## [pca] (reducing the dimensionality of data)
     # Construct a buffer used by the pca analysis
+    # convert contour points into array of contour points
     sz = len(pts)
     data_pts = np.empty((sz, 2), dtype=np.float64)
     for i in range(data_pts.shape[0]):
@@ -51,20 +52,18 @@ def getContours(pts, img):
     ## [visualization]
     # Draw the principal components
     cv2.circle(img, cntr, 3, (255, 0, 255), 2)
-    p1 = (
-    cntr[0] + 0.02 * eigenvectors[0, 0] * eigenvalues[0, 0], cntr[1] + 0.02 * eigenvectors[0, 1] * eigenvalues[0, 0])
-    p2 = (
-    cntr[0] - 0.02 * eigenvectors[1, 0] * eigenvalues[1, 0], cntr[1] - 0.02 * eigenvectors[1, 1] * eigenvalues[1, 0])
+    p1 = (cntr[0] + 0.02 * eigenvectors[0, 0] * eigenvalues[0, 0], cntr[1] + 0.02 * eigenvectors[0, 1] * eigenvalues[0, 0])
+    p2 = (cntr[0] - 0.02 * eigenvectors[1, 0] * eigenvalues[1, 0], cntr[1] - 0.02 * eigenvectors[1, 1] * eigenvalues[1, 0])
     drawAxis(img, cntr, p1, (255, 255, 0), 1)
-    drawAxis(img, cntr, p2, (0, 0, 255), 5)
+    drawAxis(img, cntr, p2, (255, 0, 0), 5)
 
     angle = atan2(eigenvectors[0, 1], eigenvectors[0, 0])  # orientation in radians
     ## [visualization]
 
     # Label with the rotation angle
-    label = "  Rotation Angle: " + str(-int(np.rad2deg(angle)) - 90) + " degrees"
-    textbox = cv2.rectangle(img, (cntr[0], cntr[1] - 25), (cntr[0] + 250, cntr[1] + 10), (255, 255, 255), -1)
-    cv2.putText(img, label, (cntr[0], cntr[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+    label = "  Rotation Angle: " + str(-int(np.rad2deg(angle))) + " degrees"
+    textbox = cv2.rectangle(img, (cntr[0] +50, cntr[1] + 50), (cntr[0] + 250, cntr[1] + 10), (255, 255, 255), -1)
+    cv2.putText(img, label, (cntr[0]+50, cntr[1]+50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
 
     return angle
 
@@ -79,7 +78,7 @@ def ledDetector(image):
 
     # separate bright spots
     # pixel's value >= 225 set to 255 (white), the rest set to 0 (black)
-    thresh = cv2.threshold(gray, 224, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY)[1]
 
     # perform a connected component analysis on the thresholded image
     labels = measure.label(thresh, connectivity=2, background=0)
@@ -100,7 +99,7 @@ def ledDetector(image):
 
         # if the number of pixels in the component is sufficiently
         # large, then add it to our mask of "large blobs"
-        if 50 < numPixels:
+        if 30 < numPixels:
             mask = cv2.add(mask, labelMask)
 
     # find the contours in the mask, then sort them from left to right
@@ -140,20 +139,18 @@ def ledDetector(image):
     triangle = cv2.fillPoly(triangle, [apexes.astype(int)], color=(0,0,255))
     triangle = np.uint8(triangle)
     triangle_grey = cv2.cvtColor(np.float32(triangle), cv2.COLOR_BGR2GRAY)
-    cv2.imshow('tri grey', triangle_grey)
+    # cv2.imshow('tri grey', triangle_grey)
     # triangle_sides = cv2.threshold(triangle, 50, 255, cv2.THRESH_BINARY)[1]
     _, bw = cv2.threshold(triangle_grey, 50, 255, cv2.THRESH_BINARY)
 
     bw = np.uint8(bw)
 
     contours, _ = cv2.findContours(bw, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-    print(contours)
 
     for i, c in enumerate(contours):
-        print("im here")
         # Draw each contour only for visualisation purposes
         cv2.drawContours(finalImage, contours, i, (0, 0, 255), 3)
-        cv2.imshow('asdfasdf', finalImage)
+        # cv2.imshow('asdfasdf', finalImage)
         # Find the orientation of each shape
         getContours(c, finalImage)
 
@@ -170,7 +167,17 @@ def ledDetector(image):
     cv2.waitKey(0)
 
 
-Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_1.jpg")
-Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_2.jpg")
+Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1.jpg")
+Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-1.jpg")
+Pic3 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-2.jpg")
+Pic4 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-3.jpg")
+# Pic5 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\Rownoramienny\prosto.jpg")
+# Pic6 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\Rownoramienny\lewo.jpg")
+
 
 ledDetector(Pic1)
+ledDetector(Pic2)
+ledDetector(Pic3)
+ledDetector(Pic4)
+# ledDetector(Pic5)
+# ledDetector(Pic6)
