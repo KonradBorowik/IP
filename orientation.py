@@ -14,6 +14,9 @@ def drawAxis(img, p_, q_, color, scale):
 
     ## [visualization1]
     angle = atan2(p[1] - q[1], p[0] - q[0])  # angle in radians
+
+    # in which quarter lays 'angle'?
+
     hypotenuse = sqrt((p[1] - q[1]) * (p[1] - q[1]) + (p[0] - q[0]) * (p[0] - q[0]))
 
     # Here we lengthen the arrow by a factor of scale
@@ -61,7 +64,7 @@ def getContours(pts, img):
     ## [visualization]
 
     # Label with the rotation angle
-    label = "  Rotation Angle: " + str(-int(np.rad2deg(angle))) + " degrees"
+    label = "  Rotation Angle: " + str(-int(np.rad2deg(angle) - 90)) + " degrees"
     textbox = cv2.rectangle(img, (cntr[0] +50, cntr[1] + 50), (cntr[0] + 250, cntr[1] + 10), (255, 255, 255), -1)
     cv2.putText(img, label, (cntr[0]+50, cntr[1]+50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
 
@@ -167,12 +170,12 @@ def ledDetector(image):
     cv2.waitKey(0)
 
 
-Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1.jpg")
-Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-1.jpg")
-Pic3 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-2.jpg")
-Pic4 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-3.jpg")
-# Pic5 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\Rownoramienny\prosto.jpg")
-# Pic6 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\Rownoramienny\lewo.jpg")
+Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\2.jpg")
+Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\2-1.jpg")
+Pic3 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\2-2.jpg")
+Pic4 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\2-3.jpg")
+# Pic5 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\Prostokatny\5.jpg")
+# Pic6 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\Prostokatny\6.jpg")
 
 
 ledDetector(Pic1)
