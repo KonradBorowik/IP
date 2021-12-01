@@ -49,11 +49,6 @@ def LedDetector(image):
     # new image to draw circles
     finalImage = resized_image.copy()
 
-    black = np.zeros((500,500,3))
-
-    listxy = []
-    listy = []
-
     # loop over the contours
     for (i, c) in enumerate(cnts):
         # draw the bright spot on the image
@@ -71,18 +66,13 @@ def LedDetector(image):
         # count each spot
         cv2.putText(finalImage, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
-    apexes = np.array(listxy)
-
-    cv2.drawContours(black, [apexes.astype(int)], 0, (0,0,255), 3)
-
     # show images step by step
     # cv2.imshow("original image", image)
     # cv2.imshow("resized image", resized_image)
     # cv2.imshow("blurred image", blurred)
     # cv2.imshow("blurred graysacle image", gray)
-    # cv2.imshow("threshold", thresh)
+    cv2.imshow("threshold", thresh)
     cv2.imshow("LEDs detected", finalImage)
-    cv2.imshow("L", black)
 
     cv2.waitKey(0)
 
