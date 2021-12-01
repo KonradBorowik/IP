@@ -57,9 +57,6 @@ def LedDetector(image):
         # compute the minimum enclosing circle for each contour
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
 
-        listxy.append((cX, cY))
-        # listy.append(cY)
-
         # draw a circle around desired spots
         cv2.circle(finalImage, (int(cX), int(cY)), int(radius), (0, 0, 255), 2)
 
@@ -77,7 +74,7 @@ def LedDetector(image):
     cv2.waitKey(0)
 
 
-Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_1.jpg")
+Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\Rownoramienny\lewo.jpg")
 Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_2.jpg")
 
 LedDetector(Pic1)
