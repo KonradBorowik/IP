@@ -14,6 +14,9 @@ def length(s1, s2):
     return length
 
 
+# TODO add class 'side' and method get shortest side
+
+
 def GetShortestSide(apexes):
     apex1 = apexes[0]
     apex2 = apexes[1]
@@ -25,10 +28,10 @@ def GetShortestSide(apexes):
 
     # SORT THIS SHIT OUT
 
-    side1 = OrderedDict(apex1[0], apex1[1], apex2[0], apex2[1], int(length1))
-    side2 = OrderedDict(apex2[0], apex2[1], apex3[0], apex3[1], int(length2))
-    side3 = OrderedDict(apex3[0], apex3[1], apex1[0], apex1[1], int(length3))
-    print('aaa')
+    side1 = apex1[0], apex1[1], apex2[0], apex2[1], int(length1)
+    side2 = apex2[0], apex2[1], apex3[0], apex3[1], int(length2)
+    side3 = apex3[0], apex3[1], apex1[0], apex1[1], int(length3)
+
 
 
 def LedDetector(image):

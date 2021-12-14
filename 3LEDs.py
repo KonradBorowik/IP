@@ -49,6 +49,7 @@ def LedDetector(image):
     # new image to draw circles
     finalImage = resized_image.copy()
 
+
     # loop over the contours
     for (i, c) in enumerate(cnts):
         # draw the bright spot on the image
