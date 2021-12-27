@@ -6,6 +6,29 @@ import numpy as np
 import math
 from PIL import Image
 
+def SideLength(s1, s2):
+    length = math.sqrt((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)
+    return length
+
+
+def ShortestSide(xy):
+    firstApex = xy[0]
+    secondApex = xy[1]
+    thirdApex = xy[2]
+
+    firstSideLength = SideLength(firstApex, secondApex)
+    secondSideLength = SideLength(secondApex, thirdApex)
+    thirdSideLength = SideLength(thirdApex, firstApex)
+
+    firstSide = [firstApex, secondApex, firstSideLength]
+    secondSide = [secondApex, thirdApex, secondSideLength]
+    thirdSide = [thirdApex, firstApex, thirdSideLength]
+
+    sides = [firstSide, secondSide, thirdSide]
+    sides.sort(key=lambda x: x[2])
+
+    return sides[0]
+
 
 def LedDetector(image):
     # resize
@@ -49,11 +72,14 @@ def LedDetector(image):
     # new image to draw circles
     finalImage = resized_image.copy()
 
+    xy = []
 
     # loop over the contours
     for (i, c) in enumerate(cnts):
         # draw the bright spot on the image
         (x, y, w, h) = cv2.boundingRect(c)
+
+        xy.append([x, y])
 
         # compute the minimum enclosing circle for each contour
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
@@ -63,6 +89,8 @@ def LedDetector(image):
 
         # count each spot
         cv2.putText(finalImage, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+
+    ShortestSide(xy)
 
     # show images step by step
     # cv2.imshow("original image", image)
