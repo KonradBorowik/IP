@@ -33,10 +33,21 @@ def ShortestSide(xy):
 
 
 def MiddlePoint(side):
-    xMid = side[0][0] - side[1][0]
-    yMid = side[0][1] - side[1][1]
+    x1 = side[0][0]
+    x2 = side[1][0]
+    y1 = side[0][1]
+    y2 = side[1][1]
 
-    return [xMid, yMid]
+    if x1 > x2: xMid = x2 + (x1 - x2)/2
+    if x2 > x1: xMid = x1 + (x2 - x1)/2
+
+    if y1 > y2: yMid = y2 + (y1 - y2)/2
+    if y2 > y1: yMid = y1 + (y2 - y1)/2
+
+    # xMid = x1 + xMid
+    # yMid = y1 + yMid
+
+    return [int(xMid), int(yMid)]
 
 def LedDetector(image):
     # resize
@@ -102,6 +113,8 @@ def LedDetector(image):
 
     center = MiddlePoint(triangleBase)
 
+    cv2.circle(finalImage, (center[0], center[1]), 1, (0,0,255), 2)
+
     # show images step by step
     # cv2.imshow("original image", image)
     # cv2.imshow("resized image", resized_image)
@@ -113,7 +126,13 @@ def LedDetector(image):
     cv2.waitKey(0)
 
 
-Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\Rownoramienny\lewo.jpg")
-Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_2.jpg")
+Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1.jpg")
+# Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_2.jpg")
+Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-1.jpg")
+Pic3 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-2.jpg")
+Pic4 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-3.jpg")
 
 LedDetector(Pic1)
+LedDetector(Pic2)
+LedDetector(Pic3)
+LedDetector(Pic4)
