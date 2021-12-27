@@ -8,7 +8,7 @@ from PIL import Image
 
 def SideLength(s1, s2):
     length = math.sqrt((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)
-    return length
+    return int(length)
 
 
 def ShortestSide(xy):
@@ -20,15 +20,23 @@ def ShortestSide(xy):
     secondSideLength = SideLength(secondApex, thirdApex)
     thirdSideLength = SideLength(thirdApex, firstApex)
 
-    firstSide = [firstApex, secondApex, firstSideLength]
-    secondSide = [secondApex, thirdApex, secondSideLength]
-    thirdSide = [thirdApex, firstApex, thirdSideLength]
+    # first 2 elements are coordinates of the beginning and ending of a side, then its length,
+    # last  element are coordinates of the third apex
+    firstSide = [firstApex, secondApex, firstSideLength, thirdApex]
+    secondSide = [secondApex, thirdApex, secondSideLength, firstApex]
+    thirdSide = [thirdApex, firstApex, thirdSideLength, secondApex]
 
     sides = [firstSide, secondSide, thirdSide]
     sides.sort(key=lambda x: x[2])
 
     return sides[0]
 
+
+def MiddlePoint(side):
+    xMid = side[0][0] - side[1][0]
+    yMid = side[0][1] - side[1][1]
+
+    return [xMid, yMid]
 
 def LedDetector(image):
     # resize
@@ -90,7 +98,9 @@ def LedDetector(image):
         # count each spot
         cv2.putText(finalImage, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
-    ShortestSide(xy)
+    triangleBase = ShortestSide(xy)
+
+    center = MiddlePoint(triangleBase)
 
     # show images step by step
     # cv2.imshow("original image", image)
