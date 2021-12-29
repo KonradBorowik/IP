@@ -49,6 +49,7 @@ def MiddlePoint(side):
 
     return [int(xMid), int(yMid)]
 
+
 def LedDetector(image):
     # resize
     resized_image = cv2.resize(image, [500, 500])
@@ -113,7 +114,11 @@ def LedDetector(image):
 
     center = MiddlePoint(triangleBase)
 
-    cv2.circle(finalImage, (center[0], center[1]), 1, (0,0,255), 2)
+    cv2.circle(finalImage, (center[0], center[1]), 9, (0,255,0), 2)
+
+    objectAngle = math.atan2(center[0] - triangleBase[3][0], center[1] - triangleBase[3][1]) * 180 / math.pi
+
+    cv2.putText(finalImage, "{}".format(int(objectAngle)), (15, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255,0,0), 1)
 
     # show images step by step
     # cv2.imshow("original image", image)
