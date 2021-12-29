@@ -5,30 +5,49 @@ import imutils
 import numpy as np
 import math
 from PIL import Image
-from collections import OrderedDict
 
-
-def length(s1, s2):
+def SideLength(s1, s2):
     length = math.sqrt((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)
+    return int(length)
 
-    return length
+
+def ShortestSide(xy):
+    firstApex = xy[0]
+    secondApex = xy[1]
+    thirdApex = xy[2]
+
+    firstSideLength = SideLength(firstApex, secondApex)
+    secondSideLength = SideLength(secondApex, thirdApex)
+    thirdSideLength = SideLength(thirdApex, firstApex)
+
+    # first 2 elements are coordinates of the beginning and ending of a side, then its length,
+    # last  element are coordinates of the third apex
+    firstSide = [firstApex, secondApex, firstSideLength, thirdApex]
+    secondSide = [secondApex, thirdApex, secondSideLength, firstApex]
+    thirdSide = [thirdApex, firstApex, thirdSideLength, secondApex]
+
+    sides = [firstSide, secondSide, thirdSide]
+    sides.sort(key=lambda x: x[2])
+
+    return sides[0]
 
 
-def GetShortestSide(apexes):
-    apex1 = apexes[0]
-    apex2 = apexes[1]
-    apex3 = apexes[2]
+def MiddlePoint(side):
+    x1 = side[0][0]
+    x2 = side[1][0]
+    y1 = side[0][1]
+    y2 = side[1][1]
 
-    length1 = length(apex1, apex2)
-    length2 = length(apex2, apex3)
-    length3 = length(apex3, apex1)
+    if x1 > x2: xMid = x2 + (x1 - x2)/2
+    if x2 > x1: xMid = x1 + (x2 - x1)/2
 
-    # SORT THIS SHIT OUT
+    if y1 > y2: yMid = y2 + (y1 - y2)/2
+    if y2 > y1: yMid = y1 + (y2 - y1)/2
 
-    side1 = OrderedDict(apex1[0], apex1[1], apex2[0], apex2[1], int(length1))
-    side2 = OrderedDict(apex2[0], apex2[1], apex3[0], apex3[1], int(length2))
-    side3 = OrderedDict(apex3[0], apex3[1], apex1[0], apex1[1], int(length3))
-    print('aaa')
+    # xMid = x1 + xMid
+    # yMid = y1 + yMid
+
+    return [int(xMid), int(yMid)]
 
 
 def LedDetector(image):
@@ -73,7 +92,7 @@ def LedDetector(image):
     # new image to draw circles
     finalImage = resized_image.copy()
 
-    apexes = []
+    xy = []
 
     # loop over the contours
     for (i, c) in enumerate(cnts):
@@ -83,7 +102,7 @@ def LedDetector(image):
         # compute the minimum enclosing circle for each contour
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
 
-        apexes.append([x, y])
+        xy.append([int(cX), int(cY)])
 
         # draw a circle around desired spots
         cv2.circle(finalImage, (int(cX), int(cY)), int(radius), (0, 0, 255), 2)
@@ -91,7 +110,16 @@ def LedDetector(image):
         # count each spot
         cv2.putText(finalImage, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
-    GetShortestSide(apexes)
+    triangleBase = ShortestSide(xy)
+
+    center = MiddlePoint(triangleBase)
+
+    cv2.circle(finalImage, (center[0], center[1]), 9, (0,255,0), 2)
+
+    objectAngle = math.atan2(center[0] - triangleBase[3][0], center[1] - triangleBase[3][1]) * 180 / math.pi
+
+    cv2.arrowedLine(finalImage, center, triangleBase[3], (255,0,0), 2)
+    cv2.putText(finalImage, "Angle: {}".format(int(objectAngle)), (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
 
     # show images step by step
     # cv2.imshow("original image", image)
@@ -104,7 +132,13 @@ def LedDetector(image):
     cv2.waitKey(0)
 
 
-Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\Rownoramienny\lewo.jpg")
-Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_2.jpg")
+Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1.jpg")
+# Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_2.jpg")
+Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-1.jpg")
+Pic3 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-2.jpg")
+Pic4 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-3.jpg")
 
 LedDetector(Pic1)
+LedDetector(Pic2)
+LedDetector(Pic3)
+LedDetector(Pic4)
