@@ -18,12 +18,17 @@ Image Processing
 - [ ] Detecting color of the LED
 * I've got an idea for that, but will try later
 
-- [x] Detecting 3 LEDs and deciding the orientation of an object
+- [x] Detecting 3 LEDs and deciding the orientation of the object
 * Detects 3 LEDs in a picture
-* connects them into a triangle isosceles triangle
-* using pca alorythm I can get the middle point of the trainlge and it's orientation in regard to hypotenuse
+* ~~connects them into a triangle isosceles triangle~~
+* ~~using pca alorythm I can get the middle point of the trainlge and it's orientation in regard to hypotenuse~~
+* asociates them with triangle apexes and sides
+* then decides the shortest base
+* calculates angle between global x axis and the triangle's height (the one that falls on the shortest base)
 
-- [ ] Following an object in a video
+- [x] Following an object in live camera feed
+* I assume every frame as a separate image
+* then, every image is being processed by the above function (the one that detects 3 LEDs and orientation in a picture)
 
 
-<i>the code is a mess but right now I'm focusing on achievieng my goal</i>
+<i>the code is a mess, but right now I'm focusing on achievieng my goal</i>
