@@ -44,9 +44,6 @@ def MiddlePoint(side):
     if y1 > y2: yMid = y2 + (y1 - y2)/2
     if y2 > y1: yMid = y1 + (y2 - y1)/2
 
-    # xMid = x1 + xMid
-    # yMid = y1 + yMid
-
     return [int(xMid), int(yMid)]
 
 
@@ -81,7 +78,7 @@ def LedDetector(image):
 
         # if the number of pixels in the component is sufficiently
         # large, then add it to our mask of "large blobs"
-        if 50 < numPixels:
+        if 20 < numPixels:
             mask = cv2.add(mask, labelMask)
 
     # find the contours in the mask, then sort them from left to right
@@ -114,7 +111,7 @@ def LedDetector(image):
 
     center = MiddlePoint(triangleBase)
 
-    cv2.circle(finalImage, (center[0], center[1]), 9, (0,255,0), 2)
+    cv2.circle(finalImage, (center[0], center[1]), 7, (0,255,0), 4)
 
     objectAngle = math.atan2(center[0] - triangleBase[3][0], center[1] - triangleBase[3][1]) * 180 / math.pi
 
@@ -126,19 +123,19 @@ def LedDetector(image):
     # cv2.imshow("resized image", resized_image)
     # cv2.imshow("blurred image", blurred)
     # cv2.imshow("blurred graysacle image", gray)
-    cv2.imshow("threshold", thresh)
-    cv2.imshow("LEDs detected", finalImage)
+    # cv2.imshow("threshold", thresh)
+    # cv2.imshow("LEDs detected", finalImage)
+    #
+    # cv2.waitKey(0)
 
-    cv2.waitKey(0)
 
-
-Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1.jpg")
-# Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_2.jpg")
-Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-1.jpg")
-Pic3 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-2.jpg")
-Pic4 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-3.jpg")
-
-LedDetector(Pic1)
-LedDetector(Pic2)
-LedDetector(Pic3)
-LedDetector(Pic4)
+# Pic1 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1.jpg")
+# # Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\3LEDs_2.jpg")
+# Pic2 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-1.jpg")
+# Pic3 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-2.jpg")
+# Pic4 = cv2.imread(r"C:\Users\konra\PycharmProjects\IP\pictures\same_photo_but_rotated\1-3.jpg")
+#
+# LedDetector(Pic1)
+# LedDetector(Pic2)
+# LedDetector(Pic3)
+# LedDetector(Pic4)
