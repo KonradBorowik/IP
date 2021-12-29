@@ -99,10 +99,10 @@ def LedDetector(image):
         # draw the bright spot on the image
         (x, y, w, h) = cv2.boundingRect(c)
 
-        xy.append([x, y])
-
         # compute the minimum enclosing circle for each contour
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
+
+        xy.append([int(cX), int(cY)])
 
         # draw a circle around desired spots
         cv2.circle(finalImage, (int(cX), int(cY)), int(radius), (0, 0, 255), 2)
@@ -118,7 +118,8 @@ def LedDetector(image):
 
     objectAngle = math.atan2(center[0] - triangleBase[3][0], center[1] - triangleBase[3][1]) * 180 / math.pi
 
-    cv2.putText(finalImage, "{}".format(int(objectAngle)), (15, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255,0,0), 1)
+    cv2.arrowedLine(finalImage, center, triangleBase[3], (255,0,0), 2)
+    cv2.putText(finalImage, "Angle: {}".format(int(objectAngle)), (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
 
     # show images step by step
     # cv2.imshow("original image", image)
