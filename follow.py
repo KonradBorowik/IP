@@ -59,8 +59,22 @@ def MiddlePoint(side):
         return [int(x_mid), int(y_mid)]
 
 
+def DestinationAngle(object_center, destination_point):
+    angle = math.atan2(object_center[0] - destination_point[0], object_center[1] - destination_point[1]) * 180 / math.pi
+    return  angle
 
+def CheckAngle(object_angle, destionation_angle):
+    if object_angle < destionation_angle:
+        print("left")
+    if object_angle > destionation_angle:
+        print("right")
+    if object_angle == destionation_angle:
+        print("go forward")
+
+
+route = [[250,250],[200,200],[300,200],[300,300],[200,300]]
 cap = cv2.VideoCapture(1)
+x = 0
 
 while True:
     timer = cv2.getTickCount()
@@ -141,12 +155,20 @@ while True:
 
     cv2.arrowedLine(finalImage, center, triangleBase[3], (255, 0, 0), 2)
     cv2.putText(finalImage, "Angle: {}".format(int(objectAngle)), (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+
+    destination_angle = DestinationAngle(center, route[x])
+
+
+
     # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # thresh = cv2.threshold(gray, 225, 255, cv2.THRESH_BINARY)[1]
 
     fps = cv2.getTickFrequency()/(cv2.getTickCount() - timer)
     cv2.putText(finalImage, str(int(fps)), (75,50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
     cv2.imshow("camera 1", finalImage)
+
+    if center == route[x]:
+        x += 1
 
     if cv2.waitKey(1) & 0xff == ord('q'):
         break
