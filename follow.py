@@ -12,21 +12,21 @@ def SideLength(s1, s2):
 
 
 def ShortestSide(xy):
-    firstApex = xy[0]
-    secondApex = xy[1]
-    thirdApex = xy[2]
+    first_apex = xy[0]
+    second_apex = xy[1]
+    third_apex = xy[2]
 
-    firstSideLength = SideLength(firstApex, secondApex)
-    secondSideLength = SideLength(secondApex, thirdApex)
-    thirdSideLength = SideLength(thirdApex, firstApex)
+    first_side_length = SideLength(first_apex, second_apex)
+    second_side_length = SideLength(second_apex, third_apex)
+    third_side_length = SideLength(third_apex, first_apex)
 
     # first 2 elements are coordinates of the beginning and ending of a side, then its length,
     # last  element are coordinates of the third apex
-    firstSide = [firstApex, secondApex, firstSideLength, thirdApex]
-    secondSide = [secondApex, thirdApex, secondSideLength, firstApex]
-    thirdSide = [thirdApex, firstApex, thirdSideLength, secondApex]
+    first_side = [first_apex, second_apex, first_side_length, third_apex]
+    second_side = [second_apex, third_apex, second_side_length, first_apex]
+    third_side = [third_apex, first_apex, third_side_length, second_apex]
 
-    sides = [firstSide, secondSide, thirdSide]
+    sides = [first_side, second_side, third_side]
     sides.sort(key=lambda x: x[2])
 
     return sides[0]
@@ -59,8 +59,23 @@ def MiddlePoint(side):
         return [int(x_mid), int(y_mid)]
 
 
+def DestinationAngle(object_center, destination_point):
+    angle = math.atan2(object_center[0] - destination_point[0], object_center[1] - destination_point[1]) * 180 / math.pi
+    return angle
 
+
+def CheckAngle(object_angle, destionation_angle):
+    if object_angle < destionation_angle -1:
+        print("left")
+    elif object_angle > destionation_angle +1:
+        print("right")
+    else:
+        print("go forward")
+
+
+route = ([250, 250], [200, 200], [300, 200], [300, 300], [200, 300])
 cap = cv2.VideoCapture(1)
+next_point = 0
 
 while True:
     timer = cv2.getTickCount()
@@ -89,14 +104,14 @@ while True:
             continue
 
         # otherwise, construct the label mask and count the number of pixels in the mask
-        labelMask = np.zeros(thresh.shape, dtype="uint8")
-        labelMask[labels == label] = 255
-        numPixels = cv2.countNonZero(labelMask)
+        label_mask = np.zeros(thresh.shape, dtype="uint8")
+        label_mask[labels == label] = 255
+        num_pixels = cv2.countNonZero(label_mask)
 
         # if the number of pixels in the component is sufficiently
         # large, then add it to our mask of "large blobs"
-        if 20 < numPixels:
-            mask = cv2.add(mask, labelMask)
+        if 20 < num_pixels:
+            mask = cv2.add(mask, label_mask)
 
     # find the contours in the mask, then sort them from left to right
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -104,7 +119,7 @@ while True:
     cnts = contours.sort_contours(cnts)[0]
 
     # new image to draw circles
-    finalImage = resized_image.copy()
+    final_image = resized_image.copy()
 
     xy = []
 
@@ -119,13 +134,13 @@ while True:
         xy.append([int(cX), int(cY)])
 
         # draw a circle around desired spots
-        cv2.circle(finalImage, (int(cX), int(cY)), int(radius), (0, 0, 255), 2)
+        cv2.circle(final_image, (int(cX), int(cY)), int(radius), (0, 0, 255), 2)
 
         # count each spot
-        cv2.putText(finalImage, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+        cv2.putText(final_image, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
     if len(xy) < 3:
-        cv2.putText(finalImage, "{X}", (220, 220), cv2.FONT_HERSHEY_SIMPLEX, 15, (0,0,255), 4)
+        cv2.putText(final_image, "{X}", (220, 220), cv2.FONT_HERSHEY_SIMPLEX, 15, (0,0,255), 4)
         continue
 
     triangleBase = ShortestSide(xy)
@@ -133,20 +148,35 @@ while True:
     center = MiddlePoint(triangleBase)
 
     if center:
-        cv2.circle(finalImage, (center[0], center[1]), 7, (0,255,0), 4)
+        cv2.circle(final_image, (center[0], center[1]), 0, (0,255,0), 5)
     else:
         continue
 
-    objectAngle = math.atan2(center[0] - triangleBase[3][0], center[1] - triangleBase[3][1]) * 180 / math.pi
+    object_angle = math.atan2(center[0] - triangleBase[3][0], center[1] - triangleBase[3][1]) * 180 / math.pi
 
-    cv2.arrowedLine(finalImage, center, triangleBase[3], (255, 0, 0), 2)
-    cv2.putText(finalImage, "Angle: {}".format(int(objectAngle)), (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+    cv2.arrowedLine(final_image, center, triangleBase[3], (255, 0, 0), 2)
+    cv2.putText(final_image, "Angle: {}".format(int(object_angle)), (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+
+    destination_angle = DestinationAngle(center, route[next_point])
+
+    CheckAngle(object_angle, destination_angle)
+
+    cv2.circle(final_image, route[next_point], 0, (0,255,255), 3)
+
+    if center == route[next_point]:
+        next_point += 1
+    if next_point == 5:
+        break
+
     # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # thresh = cv2.threshold(gray, 225, 255, cv2.THRESH_BINARY)[1]
 
+    for point1, point2 in zip(route, route[1:]):
+        cv2.line(final_image, point1, point2, [0, 255, 255], 1)
+
     fps = cv2.getTickFrequency()/(cv2.getTickCount() - timer)
-    cv2.putText(finalImage, str(int(fps)), (75,50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
-    cv2.imshow("camera 1", finalImage)
+    cv2.putText(final_image, str(int(fps)), (75,50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
+    cv2.imshow("camera 1", final_image)
 
     if cv2.waitKey(1) & 0xff == ord('q'):
         break
