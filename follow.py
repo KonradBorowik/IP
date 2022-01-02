@@ -148,7 +148,7 @@ while True:
     center = MiddlePoint(triangleBase)
 
     if center:
-        cv2.circle(final_image, (center[0], center[1]), 7, (0,255,0), 4)
+        cv2.circle(final_image, (center[0], center[1]), 0, (0,255,0), 5)
     else:
         continue
 
@@ -161,7 +161,7 @@ while True:
 
     CheckAngle(object_angle, destination_angle)
 
-    cv2.circle(final_image, route[next_point], 0, (0,0,255), 1)
+    cv2.circle(final_image, route[next_point], 0, (0,255,255), 3)
 
     if center == route[next_point]:
         next_point += 1
@@ -170,6 +170,9 @@ while True:
 
     # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # thresh = cv2.threshold(gray, 225, 255, cv2.THRESH_BINARY)[1]
+
+    for point1, point2 in zip(route, route[1:]):
+        cv2.line(final_image, point1, point2, [0, 255, 255], 1)
 
     fps = cv2.getTickFrequency()/(cv2.getTickCount() - timer)
     cv2.putText(final_image, str(int(fps)), (75,50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
