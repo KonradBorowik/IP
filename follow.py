@@ -65,9 +65,9 @@ def DestinationAngle(object_center, destination_point):
 
 
 def CheckAngle(object_angle, destionation_angle):
-    if object_angle < destionation_angle:
+    if object_angle < destionation_angle -1:
         print("left")
-    if object_angle > destionation_angle:
+    elif object_angle > destionation_angle +1:
         print("right")
     else:
         print("go forward")
@@ -161,7 +161,7 @@ while True:
 
     CheckAngle(object_angle, destination_angle)
 
-    # ctr = np.array(route[next_point]).reshape((-1, 1, 2)).astype(np.int32)
+    cv2.circle(final_image, route[next_point], 0, (0,0,255), 1)
 
     if center == route[next_point]:
         next_point += 1
