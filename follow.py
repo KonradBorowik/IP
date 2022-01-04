@@ -6,19 +6,19 @@ import imutils
 import math
 
 
-def SideLength(s1, s2):
+def side_length(s1, s2):
     length = math.sqrt((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)
     return int(length)
 
 
-def ShortestSide(xy):
-    first_apex = xy[0]
-    second_apex = xy[1]
-    third_apex = xy[2]
+def shortest_side(coords):
+    first_apex = coords[0]
+    second_apex = coords[1]
+    third_apex = coords[2]
 
-    first_side_length = SideLength(first_apex, second_apex)
-    second_side_length = SideLength(second_apex, third_apex)
-    third_side_length = SideLength(third_apex, first_apex)
+    first_side_length = side_length(first_apex, second_apex)
+    second_side_length = side_length(second_apex, third_apex)
+    third_side_length = side_length(third_apex, first_apex)
 
     # first 2 elements are coordinates of the beginning and ending of a side, then its length,
     # last  element are coordinates of the third apex
@@ -32,42 +32,27 @@ def ShortestSide(xy):
     return sides[0]
 
 
-def MiddlePoint(side):
-    x1 = side[0][0]
-    x2 = side[1][0]
-    y1 = side[0][1]
-    y2 = side[1][1]
+def middle_point(side):
+    x1 = max(side[0][0], side[1][0])
+    x2 = min(side[0][0], side[1][0])
+    y1 = max(side[0][1], side[1][1])
+    y2 = min(side[0][1], side[1][1])
 
-    if x1 > x2:
-        if y1 > y2:
-            x_mid = x2 + (x1 - x2)/2
-            y_mid = y2 + (y1 - y2) / 2
-        else:
-            x_mid = x2 + (x1 - x2) / 2
-            y_mid = y1 + (y2 - y1) / 2
+    x_mid = x2 + (x1 - x2) / 2
+    y_mid = y2 + (y1 - y2) / 2
 
-        return [int(x_mid), int(y_mid)]
-
-    if x2 > x1:
-        if y2 > y1:
-            x_mid = x1 + (x2 - x1)/2
-            y_mid = y1 + (y2 - y1) / 2
-        else:
-            y_mid = y2 + (y1 - y2) / 2
-            x_mid = x1 + (x2 - x1)/2
-
-        return [int(x_mid), int(y_mid)]
+    return [int(x_mid), int(y_mid)]
 
 
-def DestinationAngle(object_center, destination_point):
+def calculate_destination_angle(object_center, destination_point):
     angle = math.atan2(object_center[0] - destination_point[0], object_center[1] - destination_point[1]) * 180 / math.pi
-    return angle
+    return int(angle)
 
 
-def CheckAngle(object_angle, destionation_angle):
-    if object_angle < destionation_angle -1:
+def check_angle(obj_angle, dest_angle):
+    if obj_angle < dest_angle - 1:
         print("left")
-    elif object_angle > destionation_angle +1:
+    elif obj_angle > dest_angle + 1:
         print("right")
     else:
         print("go forward")
@@ -143,29 +128,29 @@ while True:
         cv2.putText(final_image, "{X}", (220, 220), cv2.FONT_HERSHEY_SIMPLEX, 15, (0,0,255), 4)
         continue
 
-    triangleBase = ShortestSide(xy)
+    triangle_base = shortest_side(xy)
 
-    center = MiddlePoint(triangleBase)
+    center = middle_point(triangle_base)
 
     if center:
         cv2.circle(final_image, (center[0], center[1]), 0, (0,255,0), 5)
     else:
         continue
 
-    object_angle = math.atan2(center[0] - triangleBase[3][0], center[1] - triangleBase[3][1]) * 180 / math.pi
+    object_angle = math.atan2(center[0] - triangle_base[3][0], center[1] - triangle_base[3][1]) * 180 / math.pi
 
-    cv2.arrowedLine(final_image, center, triangleBase[3], (255, 0, 0), 2)
+    cv2.arrowedLine(final_image, center, triangle_base[3], (255, 0, 0), 2)
     cv2.putText(final_image, "Angle: {}".format(int(object_angle)), (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
-    destination_angle = DestinationAngle(center, route[next_point])
+    destination_angle = calculate_destination_angle(center, route[next_point])
 
-    CheckAngle(object_angle, destination_angle)
+    check_angle(object_angle, destination_angle)
 
     cv2.circle(final_image, route[next_point], 0, (0,255,255), 3)
 
     if center == route[next_point]:
         next_point += 1
-    if next_point == 5:
+    if next_point == len(route):
         break
 
     # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
