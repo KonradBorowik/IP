@@ -69,12 +69,12 @@ while True:
     resized_image = cv2.resize(img, [500, 500])
 
     # convert to grayscale and apply blur
-    blurred = cv2.GaussianBlur(resized_image, (11, 11), 0)
+    blurred = cv2.GaussianBlur(resized_image, (5, 5), 0)
     gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
 
     # separate bright spots
     # pixel's value >= 225 set to 255 (white), the rest set to 0 (black)
-    thresh = cv2.threshold(gray, 224, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(gray, 230, 255, cv2.THRESH_BINARY)[1]
 
     # perform a connected component analysis on the thresholded image
     labels = measure.label(thresh, connectivity=2, background=0)
