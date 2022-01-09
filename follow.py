@@ -4,14 +4,6 @@ from imutils import contours
 from skimage import measure
 import imutils
 import math
-import serial
-import time
-
-
-print("Start")
-port = "COM5.HC-05 'Dev B'"
-bluetooth = serial.Serial(port, 9600)
-print("Connected")
 
 
 def length(s1, s2):
@@ -59,11 +51,11 @@ def calculate_destination_angle(object_center, destination_point):
 
 def check_angle(obj_angle, dest_angle):
     if obj_angle < dest_angle - 1:
-        bluetooth.write(b"3")
+        print("steer left")
     elif obj_angle > dest_angle + 1:
-        bluetooth.write(b"4")
+        print("steer right")
     else:
-        bluetooth.write(b"2")
+        print("go forward")
 
 
 route = ([250, 250], [200, 200], [300, 200], [300, 300], [200, 300])
@@ -170,5 +162,4 @@ while True:
     if cv2.waitKey(1) & 0xff == ord('q'):
         break
 
-bluetooth.close()
 print("Done")
