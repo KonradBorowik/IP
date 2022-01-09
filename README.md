@@ -34,4 +34,5 @@ Image Processing
 
 Video: https://www.youtube.com/watch?v=lGlzmWsCChs
 
-<i>the code is a mess, but right now I'm focusing on achievieng my goal</i>
+<i>09.01.22</i>
+* now the object has to be in defined proximity to destination point instead of being exactly in the same point (works smoother)
