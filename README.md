@@ -17,6 +17,7 @@ Image Processing
 
 - [ ] Detecting color of the LED
 * I've got an idea for that, but will try later
+* UPDATE: it wasn't working good enough
 
 - [x] Detecting 3 LEDs and deciding the orientation of the object
 * Detects 3 LEDs in a picture
@@ -29,6 +30,8 @@ Image Processing
 - [x] Following an object in live camera feed
 * I assume every frame as a separate image
 * then, every image is being processed by the above function (the one that detects 3 LEDs and orientation in a picture)
+* program instructs user how to move the object to complete a route
 
+Video: https://www.youtube.com/watch?v=lGlzmWsCChs
 
 <i>the code is a mess, but right now I'm focusing on achievieng my goal</i>
