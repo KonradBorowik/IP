@@ -4,6 +4,13 @@ from imutils import contours
 from skimage import measure
 import imutils
 import math
+import serial
+
+
+print("Start")
+port = "COM6.HC-05 'Dev B'"
+bluetooth = serial.Serial(port, 9600)
+print("Connected")
 
 
 def side_length(s1, s2):
@@ -49,15 +56,29 @@ def calculate_destination_angle(object_center, destination_point):
     return int(angle)
 
 
-def check_angle(obj_angle, dest_angle):
+def check_angle(obj_angle, dest_angle, last_inst):
+    next_inst = "none"
+
     if obj_angle < dest_angle - 1:
-        print("left")
+        if last_inst != "left":
+            bluetooth.write(b"2")
+            next_inst = "left"
+
     elif obj_angle > dest_angle + 1:
-        print("right")
+        if last_inst != "right":
+            bluetooth.write(b"3")
+            next_inst = "right"
     else:
-        print("go forward")
+        if last_inst != "forward":
+            bluetooth.write(b"4")
+            next_inst = "forward"
+
+    if next_inst:
+        return next_inst
 
 
+
+last_instruction = "none"
 route = ([250, 250], [200, 200], [300, 200], [300, 300], [200, 300])
 cap = cv2.VideoCapture(1)
 next_point = 0
@@ -144,7 +165,7 @@ while True:
 
     destination_angle = calculate_destination_angle(center, route[next_point])
 
-    check_angle(object_angle, destination_angle)
+    last_instruction = check_angle(object_angle, destination_angle, last_instruction)
 
     cv2.circle(final_image, route[next_point], 0, (0,255,255), 3)
 
@@ -165,3 +186,6 @@ while True:
 
     if cv2.waitKey(1) & 0xff == ord('q'):
         break
+
+bluetooth.close()
+print("Done")
