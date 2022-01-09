@@ -4,11 +4,19 @@ from imutils import contours
 from skimage import measure
 import imutils
 import math
+import serial
+import time
 
 
-def side_length(s1, s2):
-    length = math.sqrt((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)
-    return int(length)
+print("Start")
+port = "COM5.HC-05 'Dev B'"
+bluetooth = serial.Serial(port, 9600)
+print("Connected")
+
+
+def length(s1, s2):
+    l = math.sqrt((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)
+    return int(l)
 
 
 def shortest_side(coords):
@@ -16,9 +24,9 @@ def shortest_side(coords):
     second_apex = coords[1]
     third_apex = coords[2]
 
-    first_side_length = side_length(first_apex, second_apex)
-    second_side_length = side_length(second_apex, third_apex)
-    third_side_length = side_length(third_apex, first_apex)
+    first_side_length = length(first_apex, second_apex)
+    second_side_length = length(second_apex, third_apex)
+    third_side_length = length(third_apex, first_apex)
 
     # first 2 elements are coordinates of the beginning and ending of a side, then its length,
     # last  element are coordinates of the third apex
@@ -51,11 +59,11 @@ def calculate_destination_angle(object_center, destination_point):
 
 def check_angle(obj_angle, dest_angle):
     if obj_angle < dest_angle - 1:
-        print("left")
+        bluetooth.write(b"3")
     elif obj_angle > dest_angle + 1:
-        print("right")
+        bluetooth.write(b"4")
     else:
-        print("go forward")
+        bluetooth.write(b"2")
 
 
 route = ([250, 250], [200, 200], [300, 200], [300, 300], [200, 300])
@@ -95,7 +103,7 @@ while True:
 
         # if the number of pixels in the component is sufficiently
         # large, then add it to our mask of "large blobs"
-        if 20 < num_pixels:
+        if 40 < num_pixels:
             mask = cv2.add(mask, label_mask)
 
     # find the contours in the mask, then sort them from left to right
@@ -124,10 +132,6 @@ while True:
         # count each spot
         cv2.putText(final_image, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
-    if len(xy) < 3:
-        cv2.putText(final_image, "{X}", (220, 220), cv2.FONT_HERSHEY_SIMPLEX, 15, (0,0,255), 4)
-        continue
-
     triangle_base = shortest_side(xy)
 
     center = middle_point(triangle_base)
@@ -146,9 +150,9 @@ while True:
 
     check_angle(object_angle, destination_angle)
 
-    cv2.circle(final_image, route[next_point], 0, (0,255,255), 3)
+    cv2.circle(final_image, route[next_point], 3, (0,255,255), 3)
 
-    if center == route[next_point]:
+    if length(center, route[next_point]) < 3:
         next_point += 1
     if next_point == len(route):
         break
@@ -165,3 +169,6 @@ while True:
 
     if cv2.waitKey(1) & 0xff == ord('q'):
         break
+
+bluetooth.close()
+print("Done")
