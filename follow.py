@@ -77,7 +77,6 @@ def check_angle(obj_angle, dest_angle, last_inst):
         return next_inst
 
 
-
 last_instruction = "none"
 route = ([250, 250], [200, 200], [300, 200], [300, 300], [200, 300])
 cap = cv2.VideoCapture(1)
