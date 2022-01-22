@@ -13,9 +13,9 @@ bluetooth = serial.Serial(port, 9600)
 print("Connected")
 
 
-def side_length(s1, s2):
-    length = math.sqrt((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)
-    return int(length)
+def length(s1, s2):
+    l = math.sqrt((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)
+    return int(l)
 
 
 def shortest_side(coords):
@@ -23,9 +23,9 @@ def shortest_side(coords):
     second_apex = coords[1]
     third_apex = coords[2]
 
-    first_side_length = side_length(first_apex, second_apex)
-    second_side_length = side_length(second_apex, third_apex)
-    third_side_length = side_length(third_apex, first_apex)
+    first_side_length = length(first_apex, second_apex)
+    second_side_length = length(second_apex, third_apex)
+    third_side_length = length(third_apex, first_apex)
 
     # first 2 elements are coordinates of the beginning and ending of a side, then its length,
     # last  element are coordinates of the third apex
@@ -60,7 +60,6 @@ def check_angle(obj_angle, dest_angle, last_inst):
     if obj_angle < dest_angle - 1:
         next_inst = "left"
         if last_inst != next_inst:
-            print("send it")
             bluetooth.write(b"2")
         return next_inst
 
@@ -125,7 +124,7 @@ while True:
         cnts = contours.sort_contours(cnts)[0]
     else:
         continue
-    # print("leds detected")
+
     # new image to draw circles
     final_image = resized_image.copy()
 
@@ -133,9 +132,6 @@ while True:
 
     # loop over the contours
     for (i, c) in enumerate(cnts):
-        # draw the bright spot on the image
-        (x, y, w, h) = cv2.boundingRect(c)
-
         # compute the minimum enclosing circle for each contour
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
 
@@ -145,13 +141,8 @@ while True:
         cv2.circle(final_image, (int(cX), int(cY)), int(radius), (0, 0, 255), 2)
 
         # count each spot
-        cv2.putText(final_image, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+        cv2.putText(final_image, "#{}".format(i + 1), (cX, cY - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
-
-    # print("continue 1")
-
-
-    # print("searching dor triangle")
     triangle_base = shortest_side(xy)
 
     center = middle_point(triangle_base)
@@ -159,7 +150,6 @@ while True:
     if center:
         cv2.circle(final_image, (center[0], center[1]), 0, (0,255,0), 5)
     else:
-        print("continue 2")
         continue
 
     object_angle = math.atan2(center[0] - triangle_base[3][0], center[1] - triangle_base[3][1]) * 180 / math.pi
@@ -168,9 +158,7 @@ while True:
     cv2.putText(final_image, "Angle: {}".format(int(object_angle)), (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
     destination_angle = calculate_destination_angle(center, route[next_point])
-    # print("prebluetooth")
     last_instruction = check_angle(object_angle, destination_angle, last_instruction)
-    # print("postbluetooth")
     cv2.circle(final_image, route[next_point], 0, (0,255,255), 3)
 
     if center == route[next_point]:
@@ -183,7 +171,6 @@ while True:
 
     for point1, point2 in zip(route, route[1:]):
         cv2.line(final_image, point1, point2, [0, 255, 255], 1)
-    # print("imshow")
     fps = cv2.getTickFrequency()/(cv2.getTickCount() - timer)
     cv2.putText(final_image, str(int(fps)), (75,50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
     cv2.imshow("camera 1", final_image)
