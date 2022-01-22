@@ -21,7 +21,7 @@ Image Processing
 
 - [x] Detecting 3 LEDs and deciding the orientation of the object
 * Detects 3 LEDs in a picture
-* ~~connects them into a triangle isosceles triangle~~
+* ~~connects them into a isosceles triangle~~
 * ~~using pca alorythm I can get the middle point of the trainlge and it's orientation in regard to hypotenuse~~
 * asociates them with triangle apexes and sides
 * then decides the shortest base
