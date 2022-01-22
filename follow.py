@@ -128,29 +128,24 @@ while True:
     # new image to draw circles
     final_image = resized_image.copy()
 
-    xy = []
+    apexes = []
 
     # loop over the contours
     for (i, c) in enumerate(cnts):
         # compute the minimum enclosing circle for each contour
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
 
-        xy.append([int(cX), int(cY)])
+        apexes.append([int(cX), int(cY)])
 
         # draw a circle around desired spots
         cv2.circle(final_image, (int(cX), int(cY)), int(radius), (0, 0, 255), 2)
 
         # count each spot
-        cv2.putText(final_image, "#{}".format(i + 1), (cX, cY - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+        # cv2.putText(final_image, "#{}".format(i + 1), (cX, cY - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
-    triangle_base = shortest_side(xy)
+    triangle_base = shortest_side(apexes)
 
     center = middle_point(triangle_base)
-
-    if center:
-        cv2.circle(final_image, (center[0], center[1]), 0, (0,255,0), 5)
-    else:
-        continue
 
     object_angle = math.atan2(center[0] - triangle_base[3][0], center[1] - triangle_base[3][1]) * 180 / math.pi
 
@@ -161,7 +156,7 @@ while True:
     last_instruction = check_angle(object_angle, destination_angle, last_instruction)
     cv2.circle(final_image, route[next_point], 0, (0,255,255), 3)
 
-    if center == route[next_point]:
+    if length(center, route[next_point]) < 3:
         next_point += 1
     if next_point == len(route):
         break
@@ -171,6 +166,7 @@ while True:
 
     for point1, point2 in zip(route, route[1:]):
         cv2.line(final_image, point1, point2, [0, 255, 255], 1)
+
     fps = cv2.getTickFrequency()/(cv2.getTickCount() - timer)
     cv2.putText(final_image, str(int(fps)), (75,50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
     cv2.imshow("camera 1", final_image)
