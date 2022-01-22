@@ -8,7 +8,7 @@ import serial
 
 
 print("Start")
-port = "COM6.HC-05 'Dev B'"
+port = "COM5.HC-05 'Dev B'"
 bluetooth = serial.Serial(port, 9600)
 print("Connected")
 
@@ -57,23 +57,23 @@ def calculate_destination_angle(object_center, destination_point):
 
 
 def check_angle(obj_angle, dest_angle, last_inst):
-    next_inst = "none"
-
     if obj_angle < dest_angle - 1:
-        if last_inst != "left":
+        next_inst = "left"
+        if last_inst != next_inst:
+            print("send it")
             bluetooth.write(b"2")
-            next_inst = "left"
+        return next_inst
 
     elif obj_angle > dest_angle + 1:
-        if last_inst != "right":
+        next_inst = "right"
+        if last_inst != next_inst:
             bluetooth.write(b"3")
-            next_inst = "right"
-    else:
-        if last_inst != "forward":
-            bluetooth.write(b"4")
-            next_inst = "forward"
+        return next_inst
 
-    if next_inst:
+    else:
+        next_inst = "forward"
+        if last_inst != next_inst:
+            bluetooth.write(b"4")
         return next_inst
 
 
@@ -94,7 +94,7 @@ while True:
 
     # separate bright spots
     # pixel's value >= 225 set to 255 (white), the rest set to 0 (black)
-    thresh = cv2.threshold(gray, 224, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(gray, 230, 255, cv2.THRESH_BINARY)[1]
 
     # perform a connected component analysis on the thresholded image
     labels = measure.label(thresh, connectivity=2, background=0)
@@ -115,14 +115,17 @@ while True:
 
         # if the number of pixels in the component is sufficiently
         # large, then add it to our mask of "large blobs"
-        if 20 < num_pixels:
+        if 50 < num_pixels:
             mask = cv2.add(mask, label_mask)
 
     # find the contours in the mask, then sort them from left to right
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
-    cnts = contours.sort_contours(cnts)[0]
-
+    if len(cnts) > 0:
+        cnts = contours.sort_contours(cnts)[0]
+    else:
+        continue
+    # print("leds detected")
     # new image to draw circles
     final_image = resized_image.copy()
 
@@ -144,10 +147,11 @@ while True:
         # count each spot
         cv2.putText(final_image, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
-    if len(xy) < 3:
-        cv2.putText(final_image, "{X}", (220, 220), cv2.FONT_HERSHEY_SIMPLEX, 15, (0,0,255), 4)
-        continue
 
+    # print("continue 1")
+
+
+    # print("searching dor triangle")
     triangle_base = shortest_side(xy)
 
     center = middle_point(triangle_base)
@@ -155,6 +159,7 @@ while True:
     if center:
         cv2.circle(final_image, (center[0], center[1]), 0, (0,255,0), 5)
     else:
+        print("continue 2")
         continue
 
     object_angle = math.atan2(center[0] - triangle_base[3][0], center[1] - triangle_base[3][1]) * 180 / math.pi
@@ -163,9 +168,9 @@ while True:
     cv2.putText(final_image, "Angle: {}".format(int(object_angle)), (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
     destination_angle = calculate_destination_angle(center, route[next_point])
-
+    # print("prebluetooth")
     last_instruction = check_angle(object_angle, destination_angle, last_instruction)
-
+    # print("postbluetooth")
     cv2.circle(final_image, route[next_point], 0, (0,255,255), 3)
 
     if center == route[next_point]:
@@ -178,7 +183,7 @@ while True:
 
     for point1, point2 in zip(route, route[1:]):
         cv2.line(final_image, point1, point2, [0, 255, 255], 1)
-
+    # print("imshow")
     fps = cv2.getTickFrequency()/(cv2.getTickCount() - timer)
     cv2.putText(final_image, str(int(fps)), (75,50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
     cv2.imshow("camera 1", final_image)
