@@ -4,6 +4,13 @@ from imutils import contours
 from skimage import measure
 import imutils
 import math
+import serial
+
+
+print("Start")
+port = "COM5.HC-05 'Dev B'"
+bluetooth = serial.Serial(port, 9600)
+print("Connected")
 
 
 def length(s1, s2):
@@ -49,15 +56,25 @@ def calculate_destination_angle(object_center, destination_point):
     return int(angle)
 
 
-def check_angle(obj_angle, dest_angle):
+def check_angle(obj_angle, dest_angle, last_inst):
     if obj_angle < dest_angle - 1:
-        print("steer left")
+        next_inst = "left"
+        if last_inst != next_inst:
+            bluetooth.write(b"2")
+        return next_inst
     elif obj_angle > dest_angle + 1:
-        print("steer right")
+        next_inst = "right"
+        if last_inst != next_inst:
+            bluetooth.write(b"3")
+        return next_inst
     else:
-        print("go forward")
+        next_inst = "forward"
+        if last_inst != next_inst:
+            bluetooth.write(b"4")
+        return next_inst
 
 
+last_instruction = "none"
 route = ([250, 250], [200, 200], [300, 200], [300, 300], [200, 300])
 cap = cv2.VideoCapture(1)
 next_point = 0
@@ -95,7 +112,7 @@ while True:
 
         # if the number of pixels in the component is sufficiently
         # large, then add it to our mask of "large blobs"
-        if 40 < num_pixels:
+        if 50 < num_pixels:
             mask = cv2.add(mask, label_mask)
 
     # find the contours in the mask, then sort them from left to right
@@ -121,10 +138,12 @@ while True:
         # draw a circle around desired spots
         cv2.circle(final_image, (int(cX), int(cY)), int(radius), (0, 0, 255), 2)
 
+        # count each spot
+        # cv2.putText(final_image, "#{}".format(i + 1), (cX, cY - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+
     triangle_base = shortest_side(apexes)
 
     center = middle_point(triangle_base)
-
     cv2.circle(final_image, (center[0], center[1]), 0, (0,255,0), 5)
 
     object_angle = math.atan2(center[0] - triangle_base[3][0], center[1] - triangle_base[3][1]) * 180 / math.pi
@@ -134,9 +153,8 @@ while True:
 
     destination_angle = calculate_destination_angle(center, route[next_point])
 
-    check_angle(object_angle, destination_angle)
-
-    cv2.circle(final_image, route[next_point], 3, (0,255,255), 3)
+    last_instruction = check_angle(object_angle, destination_angle, last_instruction)
+    cv2.circle(final_image, route[next_point], 0, (0,255,255), 3)
 
     if length(center, route[next_point]) < 3:
         next_point += 1
@@ -156,4 +174,5 @@ while True:
     if cv2.waitKey(1) & 0xff == ord('q'):
         break
 
+bluetooth.close()
 print("Done")
