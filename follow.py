@@ -101,37 +101,31 @@ while True:
     # find the contours in the mask, then sort them from left to right
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
-    cnts = contours.sort_contours(cnts)[0]
+    if len(cnts) > 0:
+        cnts = contours.sort_contours(cnts)[0]
+    else:
+        continue
 
     # new image to draw circles
     final_image = resized_image.copy()
 
-    xy = []
+    apexes = []
 
     # loop over the contours
     for (i, c) in enumerate(cnts):
-        # draw the bright spot on the image
-        (x, y, w, h) = cv2.boundingRect(c)
-
         # compute the minimum enclosing circle for each contour
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
 
-        xy.append([int(cX), int(cY)])
+        apexes.append([int(cX), int(cY)])
 
         # draw a circle around desired spots
         cv2.circle(final_image, (int(cX), int(cY)), int(radius), (0, 0, 255), 2)
 
-        # count each spot
-        cv2.putText(final_image, "#{}".format(i + 1), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-
-    triangle_base = shortest_side(xy)
+    triangle_base = shortest_side(apexes)
 
     center = middle_point(triangle_base)
 
-    if center:
-        cv2.circle(final_image, (center[0], center[1]), 0, (0,255,0), 5)
-    else:
-        continue
+    cv2.circle(final_image, (center[0], center[1]), 0, (0,255,0), 5)
 
     object_angle = math.atan2(center[0] - triangle_base[3][0], center[1] - triangle_base[3][1]) * 180 / math.pi
 
