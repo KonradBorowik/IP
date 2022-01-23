@@ -91,7 +91,7 @@ while True:
 
     # separate bright spots
     # pixel's value >= 225 set to 255 (white), the rest set to 0 (black)
-    thresh = cv2.threshold(gray, 230, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY)[1]
 
     # perform a connected component analysis on the thresholded image
     labels = measure.label(thresh, connectivity=2, background=0)
@@ -112,7 +112,7 @@ while True:
 
         # if the number of pixels in the component is sufficiently
         # large, then add it to our mask of "large blobs"
-        if 50 < num_pixels:
+        if 40 < num_pixels:
             mask = cv2.add(mask, label_mask)
 
     # find the contours in the mask, then sort them from left to right
@@ -140,6 +140,9 @@ while True:
 
         # count each spot
         # cv2.putText(final_image, "#{}".format(i + 1), (cX, cY - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+
+    if len(apexes) < 3:
+        continue
 
     triangle_base = shortest_side(apexes)
 
