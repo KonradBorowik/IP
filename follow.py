@@ -61,21 +61,24 @@ def check_angle(obj_angle, dest_angle, last_inst):
         next_inst = "left"
         if last_inst != next_inst:
             bluetooth.write(b"2")
+            print("left")
         return next_inst
     elif obj_angle > dest_angle + 1:
         next_inst = "right"
         if last_inst != next_inst:
             bluetooth.write(b"3")
+            print("right")
         return next_inst
     else:
         next_inst = "forward"
         if last_inst != next_inst:
             bluetooth.write(b"4")
+            print("forward")
         return next_inst
 
 
 last_instruction = "none"
-route = ([250, 250], [200, 200], [300, 200], [300, 300], [200, 300])
+route = ([250, 250], [150, 150], [100, 125], [80, 400], [250, 410], [350, 250], [400, 200], [300, 125])
 cap = cv2.VideoCapture(1)
 next_point = 0
 
@@ -91,7 +94,7 @@ while True:
 
     # separate bright spots
     # pixel's value >= 225 set to 255 (white), the rest set to 0 (black)
-    thresh = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(gray, 245, 255, cv2.THRESH_BINARY)[1]
 
     # perform a connected component analysis on the thresholded image
     labels = measure.label(thresh, connectivity=2, background=0)
@@ -115,16 +118,21 @@ while True:
         if 40 < num_pixels:
             mask = cv2.add(mask, label_mask)
 
+    # new image to draw circles
+    final_image = resized_image.copy()
+
     # find the contours in the mask, then sort them from left to right
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
-    if len(cnts) > 0:
+    if len(cnts) > 2:
         cnts = contours.sort_contours(cnts)[0]
     else:
+        cv2.putText(final_image, "Too few LEDs", (200, 250), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                    (255, 255, 0), 2)
+        cv2.imshow("camera 1", final_image)
+        if cv2.waitKey(1) & 0xff == ord('q'):
+            break
         continue
-
-    # new image to draw circles
-    final_image = resized_image.copy()
 
     apexes = []
 
@@ -157,7 +165,9 @@ while True:
     destination_angle = calculate_destination_angle(center, route[next_point])
 
     last_instruction = check_angle(object_angle, destination_angle, last_instruction)
-    cv2.circle(final_image, route[next_point], 0, (0,255,255), 3)
+    cv2.putText(final_image, str(last_instruction), (75,50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
+
+    cv2.circle(final_image, route[next_point], 1, (0,255,255), 9)
 
     if length(center, route[next_point]) < 3:
         next_point += 1
@@ -168,10 +178,10 @@ while True:
     # thresh = cv2.threshold(gray, 225, 255, cv2.THRESH_BINARY)[1]
 
     for point1, point2 in zip(route, route[1:]):
-        cv2.line(final_image, point1, point2, [0, 255, 255], 1)
+        cv2.line(final_image, point1, point2, [255, 255, 0], 3)
 
     fps = cv2.getTickFrequency()/(cv2.getTickCount() - timer)
-    cv2.putText(final_image, str(int(fps)), (75,50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
+    cv2.putText(final_image, "current fps {}".format(str(int(fps))), (250,30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
     cv2.imshow("camera 1", final_image)
 
     if cv2.waitKey(1) & 0xff == ord('q'):
