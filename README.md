@@ -32,7 +32,4 @@ Image Processing
 * then, every image is being processed by the above function (the one that detects 3 LEDs and orientation in a picture)
 * program instructs user how to move the object to complete a route
 
-Video: https://www.youtube.com/watch?v=lGlzmWsCChs
-
-<i>09.01.22</i>
-* now the object has to be in defined proximity to destination point instead of being exactly in the same point (works smoother)
+Video: https://youtu.be/k-LYcO7BcV8
